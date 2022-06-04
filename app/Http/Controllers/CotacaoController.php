@@ -40,7 +40,7 @@ class CotacaoController extends Controller
      */
     public function show($id)
     {
-        //
+        return Cotacao_frete::find($id);
     }
 
     /**
@@ -50,9 +50,33 @@ class CotacaoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+        $buscaUf = Cotacao_frete::where('uf', $request->uf)->first();
+        if(!$buscaUf) {
+            return response()->json([
+                'message' => 'Cotação não cadastrada o UF.',
+            ], 500);
+        }
+
+        $cotacoesLista = Cotacao_frete::all();
+
+        $cotacoes = [];
+
+        foreach ($cotacoesLista as $cotacao) {
+
+            $valor_cotacao = (($request->valor_pedido / 100) * $cotacao->percentual_cotacao) + $cotacao->valor_extra;
+
+            $cotacoes[] = array(
+                "uf" => $cotacao->uf,
+                "transportadora_id" => $cotacao->transportadora_id,
+                "valor_pedido" => $request->valor_pedido,
+                "valor_cotacao" => round($valor_cotacao, 2)
+
+            );
+
+        };
+        return collect($cotacoes)->sortBy('valor_cotacao')->shift(3)->toArray();
     }
 
     /**

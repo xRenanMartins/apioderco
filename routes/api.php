@@ -15,8 +15,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/cotacao', [CotacaoController::class, 'index']);
-Route::post('/cotacao', [CotacaoController::class, 'store']);
 
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //     return $request->user();

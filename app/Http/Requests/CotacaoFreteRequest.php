@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class CotacaoFreteRequest extends FormRequest
 {
@@ -24,10 +25,20 @@ class CotacaoFreteRequest extends FormRequest
     public function rules()
     {
         return [
-            'uf' => 'required|string|unique:cotacao_fretes',
+            'uf' => ['required','max:2', Rule::unique('cotacao_fretes')->where(function ($query) {
+                return $query->where('uf', strtoupper($this->uf))->where('transportadora_id', $this->transportadora_id);
+            })],
+            // 'uf' => 'required|string|unique:cotacao_fretes',
             'percentual_cotacao' => 'required|numeric',
             'valor_extra' => 'required|numeric',
-            'transportadora_id' => 'required|unique:cotacao_fretes'
+            'transportadora_id' => 'required'
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'unique' => 'O estado(UF) e a transportadora não pode ser repetido.'
         ];
     }
 }
